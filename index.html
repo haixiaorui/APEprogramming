@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APE编程竞赛协会</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fdf8;
+            color: #1a202c;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .tab-active {
+            border-color: #2dd4bf;
+            color: #0d9488;
+            background-color: #ccfbf1;
+        }
+        .tab-inactive {
+            border-color: transparent;
+            color: #4a5568;
+        }
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Chosen Palette: Warm Harmony (Background: #FDFBF8, Text: #1a202c, Primary: #0d9488, Accent: #2dd4bf, Secondary: #f0abfc) -->
+    <!-- Application Structure Plan: 本应用设计为一个单页滚动式网站，旨在将线性的PPT信息转化为一种沉浸式、引导性的浏览体验。结构依次为：1. 英雄区域：以强烈的视觉冲击和直接的行动号召（CTA）吸引用户。2. 关于我们：简洁介绍社团核心价值。3. 为何加入：通过卡片式布局清晰展示社团优势，便于快速阅读。4. 特色活动：采用交互式标签页，鼓励用户探索，避免信息过载。5. 技术焦点分布：通过动态图表（甜甜圈图）将抽象的“技术分享”内容数据化、可视化，增加专业感和吸引力。6. 项目展示：以图文卡片形式展示成果，比纯文本列表更具说服力。7. 加入我们：最后的行动号召区域，提供明确的加入方式。这个非线性的、以用户探索为中心的设计，比传统PPT更能激发潜在成员的兴趣和参与感。 -->
+    <!-- Visualization & Content Choices: 1. 社团技术焦点: 报告信息 -> 技术分享沙龙涵盖多个领域 -> 目标 -> 直观展示技术领域的多样性和分布 -> 可视化方法 -> 甜甜圈图 (Chart.js) -> 交互 -> 鼠标悬停显示各领域名称和占比 -> 理由 -> 相比于枯燥的文字列表，图表能迅速传达社团的技术广度，更具现代感和吸引力。2. 特色活动: 报告信息 -> 四个主要特色活动 -> 目标 -> 清晰、有组织地展示活动详情，同时保持页面整洁 -> 呈现方法 -> 标签页系统 (HTML/CSS/JS) -> 交互 -> 点击不同标签切换显示对应的内容 -> 理由 -> 这种交互方式鼓励用户主动探索，比静态列表更具参与感，且能有效组织内容，避免页面冗长。 -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-teal-800">
+                APE编程竞赛协会
+            </div>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#about" class="text-gray-600 hover:text-teal-600 transition-colors">关于我们</a>
+                <a href="#benefits" class="text-gray-600 hover:text-teal-600 transition-colors">社团优势</a>
+                <a href="#activities" class="text-gray-600 hover:text-teal-600 transition-colors">特色活动</a>
+                <a href="#projects" class="text-gray-600 hover:text-teal-600 transition-colors">项目展示</a>
+                <a href="#join" class="bg-teal-600 text-white px-4 py-2 rounded-full hover:bg-teal-700 transition-transform hover:scale-105">立即加入</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <span class="text-3xl">☰</span>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#about" class="block py-2 px-6 text-sm text-gray-700 hover:bg-teal-50">关于我们</a>
+            <a href="#benefits" class="block py-2 px-6 text-sm text-gray-700 hover:bg-teal-50">社团优势</a>
+            <a href="#activities" class="block py-2 px-6 text-sm text-gray-700 hover:bg-teal-50">特色活动</a>
+            <a href="#projects" class="block py-2 px-6 text-sm text-gray-700 hover:bg-teal-50">项目展示</a>
+            <a href="#join" class="block py-2 px-6 text-sm bg-teal-100 text-teal-800 font-semibold">立即加入</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 bg-teal-50">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-teal-900 leading-tight">代码编织梦想，竞赛铸就未来。</h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">加入 APE编程竞赛协会，与我们一同探索代码的无穷魅力，开启属于你的编程创新之旅。</p>
+                <a href="#join" class="mt-8 inline-block bg-teal-600 text-white text-lg font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-teal-700 transition-transform hover:scale-105 transform">开启你的旅程</a>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 md:py-24 section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">关于我们：APE编程竞赛协会</h2>
+                    <p class="mt-3 text-gray-600 max-w-3xl mx-auto">我们是一个由热爱编程、充满激情的学生组成的社区。无论你是经验丰富的开发者，还是对编程充满好奇的初学者，这里都欢迎你的加入！</p>
+                </div>
+                <div class="grid md:grid-cols-4 gap-8 text-center">
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                        <div class="text-4xl text-teal-500 mb-3">🎓</div>
+                        <h3 class="text-xl font-semibold mb-2">学习</h3>
+                        <p class="text-gray-500 text-sm">系统性的学习计划与资源分享，助你打下坚实基础。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                        <div class="text-4xl text-teal-500 mb-3">🚀</div>
+                        <h3 class="text-xl font-semibold mb-2">实践</h3>
+                        <p class="text-gray-500 text-sm">投身真实项目，将理论知识转化为解决问题的能力。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                        <div class="text-4xl text-teal-500 mb-3">💬</div>
+                        <h3 class="text-xl font-semibold mb-2">分享</h3>
+                        <p class="text-gray-500 text-sm">在开放的交流氛围中，分享知识，共同成长。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                        <div class="text-4xl text-teal-500 mb-3">💡</div>
+                        <h3 class="text-xl font-semibold mb-2">创新</h3>
+                        <p class="text-gray-500 text-sm">鼓励奇思妙想，用代码将创意变为现实。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits" class="py-16 md:py-24 bg-white section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">为什么要加入我们？</h2>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-teal-50 p-8 rounded-lg transition-transform hover:-translate-y-2">
+                        <h3 class="text-xl font-bold text-teal-800 mb-3">提升技能</h3>
+                        <p class="text-gray-600">通过定期的技术分享和学习，掌握主流编程语言和前沿技术框架。</p>
+                    </div>
+                    <div class="bg-fuchsia-50 p-8 rounded-lg transition-transform hover:-translate-y-2">
+                        <h3 class="text-xl font-bold text-fuchsia-800 mb-3">实践项目</h3>
+                        <p class="text-gray-600">参与社团真实项目，将理论知识应用到实践中，累积宝贵经验。</p>
+                    </div>
+                    <div class="bg-orange-50 p-8 rounded-lg transition-transform hover:-translate-y-2">
+                        <h3 class="text-xl font-bold text-orange-800 mb-3">思想碰撞</h3>
+                        <p class="text-gray-600">与志同道合的伙伴交流，共同解决难题，激发无限创意。</p>
+                    </div>
+                    <div class="bg-sky-50 p-8 rounded-lg transition-transform hover:-translate-y-2">
+                        <h3 class="text-xl font-bold text-sky-800 mb-3">广阔机会</h3>
+                        <p class="text-gray-600">获得专业老师指导，参与校内外竞赛，赢取丰厚奖品与机遇。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="activities" class="py-16 md:py-24 section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">我们的特色活动</h2>
+                    <p class="mt-3 text-gray-600 max-w-3xl mx-auto">我们为你设计了多样化的活动，无论你是编程新手还是老手，都能在这里找到自己的舞台。</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-center border-b-2 border-gray-200 mb-8">
+                        <button data-tab="tab1" class="tab-button text-lg font-medium py-3 px-6 border-b-4 tab-active">新生培训</button>
+                        <button data-tab="tab2" class="tab-button text-lg font-medium py-3 px-6 border-b-4 tab-inactive">技术分享</button>
+                        <button data-tab="tab3" class="tab-button text-lg font-medium py-3 px-6 border-b-4 tab-inactive">实战项目</button>
+                    </div>
+                    <div id="tab-content" class="bg-white p-8 rounded-lg shadow-inner">
+                        <div id="tab1" class="tab-pane">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">新生培训 🔰</h3>
+                            <p class="text-gray-600">专为零基础同学设计，由经验丰富的学长学姐带领，从环境配置到掌握基础语法，助你轻松跨入编程大门，告别“Hello World”就放弃的窘境。</p>
+                        </div>
+                        <div id="tab2" class="tab-pane hidden">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">技术分享 🎤</h3>
+                            <p class="text-gray-600">每周一次的分享活动，由社团成员展示自己一周的成果，大家共同讨论和进步。</p>
+                        </div>
+                        <div id="tab3" class="tab-pane hidden">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">实战项目 🛠️</h3>
+                            <p class="text-gray-600">纸上得来终觉浅，绝知此事要躬行。在实战项目中，你将与小组成员合作，从需求分析到代码实现，完整地体验一个真实项目的开发流程。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech-focus" class="py-16 md:py-24 bg-white section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">社团技术焦点分布</h2>
+                    <p class="mt-3 text-gray-600 max-w-3xl mx-auto">我们的技术分享涵盖了当今最热门、最核心的技术领域，确保每位成员都能接触到前沿知识。下图是我们活动中各技术方向的关注度分布。</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="techFocusChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-16 md:py-24 bg-teal-50/50 section-fade-in">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">往期获奖成员展示</h2>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
+                        <div class="h-48 flex items-center justify-center p-4">
+                            <img src="https://s21.ax1x.com/2025/09/13/pVWrKVf.jpg" alt="国家级三等奖图片" class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">国家级三等奖</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
+                        <div class="h-48 flex items-center justify-center p-4">
+                            <img src="https://s21.ax1x.com/2025/09/13/pVWrQIS.jpg" alt="省级一等奖图片" class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">省级一等奖</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
+                        <div class="h-48 flex items-center justify-center p-4">
+                            <img src="https://s21.ax1x.com/2025/09/13/pVWrMa8.jpg" alt="省级二等奖图片" class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">省级二等奖</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="join" class="py-20 md:py-32 section-fade-in">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-gray-800">是时候加入我们了！</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">不要犹豫，立即行动。我们期待你的加入，一起用代码改变世界！</p>
+                <div class="mt-10 max-w-md mx-auto bg-white p-8 rounded-xl shadow-2xl">
+                    <div class="w-48 h-48 mx-auto my-6 flex items-center justify-center">
+                        <img src="https://s21.ax1x.com/2025/09/13/pVWynN8.jpg" alt="报名二维码" class="max-h-full max-w-full object-contain">
+                    </div>
+                    <p class="text-lg font-medium text-gray-800">扫描上方二维码加入纳新群</p>
+                    <p class="mt-2 text-gray-500">或关注社团公众号获取最新动态</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center text-sm">
+            <p>&copy; 2025 APE编程竞赛协会</p>
+            <p class="mt-2 text-gray-400">由社团成员倾情打造</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('tab-inactive');
+                    });
+                    button.classList.add('tab-active');
+                    button.classList.remove('tab-inactive');
+
+                    tabPanes.forEach(pane => {
+                        if (pane.id === tabId) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const ctx = document.getElementById('techFocusChart').getContext('2d');
+            const techFocusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {      
+                    labels: ['算法编程', '学科竞赛', '团队协作'],
+                    datasets: [{
+                        label: '技术焦点分布',
+                        data: [33.3, 33.3, 33.3],
+                        backgroundColor: [
+                            'rgba(13, 148, 136, 0.8)', // teal
+                            'rgba(217, 70, 239, 0.8)', // fuchsia
+                            'rgba(249, 115, 22, 0.8)' // orange
+                        ],
+                        borderColor: [
+                            '#FDFBF8'
+                        ],
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    family: "'Noto Sans SC', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            document.querySelectorAll('.section-fade-in').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
